@@ -1,96 +1,57 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const descriptionInput = document.getElementById("description");
-    const amountInput = document.getElementById("amount");
-    const typeInput = document.getElementById("type");
-    const addButton = document.getElementById("add-btn");
-    const resetButton = document.getElementById("reset-btn");
-    const entriesList = document.getElementById("entries-list");
-    const totalIncomeElem = document.getElementById("total-income");
-    const totalExpenseElem = document.getElementById("total-expense");
-    const netBalanceElem = document.getElementById("net-balance");
-    const filters = document.getElementsByName("filter");
+let entries = JSON.parse(localStorage.getItem('entries')) || [];
 
-    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+function updateUI() {
+    const totalIncome = entries.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
+    const totalExpense = entries.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
+    const balance = totalIncome - totalExpense;
+    
+    document.getElementById('total-income').textContent = totalIncome;
+    document.getElementById('total-expense').textContent = totalExpense;
+    document.getElementById('net-balance').textContent = balance;
+    
+    filterEntries();
+    localStorage.setItem('entries', JSON.stringify(entries));
+}
 
-    function updateSummary() {
-        let totalIncome = transactions
-            .filter((t) => t.type === "income")
-            .reduce((sum, t) => sum + t.amount, 0);
+function addEntry() {
+    const desc = document.getElementById('desc').value.trim();
+    const amount = parseFloat(document.getElementById('amount').value);
+    const type = document.getElementById('type').value;
+    if (!desc || isNaN(amount) || amount <= 0) return;
+    
+    entries.push({ id: Date.now(), desc, amount, type });
+    document.getElementById('desc').value = '';
+    document.getElementById('amount').value = '';
+    updateUI();
+}
 
-        let totalExpense = transactions
-            .filter((t) => t.type === "expense")
-            .reduce((sum, t) => sum + t.amount, 0);
+function deleteEntry(id) {
+    entries = entries.filter(e => e.id !== id);
+    updateUI();
+}
 
-        totalIncomeElem.textContent = totalIncome;
-        totalExpenseElem.textContent = totalExpense;
-        netBalanceElem.textContent = totalIncome - totalExpense;
-    }
+function editEntry(id) {
+    const entry = entries.find(e => e.id === id);
+    document.getElementById('desc').value = entry.desc;
+    document.getElementById('amount').value = entry.amount;
+    document.getElementById('type').value = entry.type;
+    deleteEntry(id);
+}
 
-    function renderTransactions(filter = "all") {
-        entriesList.innerHTML = "";
-
-        let filteredTransactions = transactions.filter((t) =>
-            filter === "all" ? true : t.type === filter
-        );
-
-        filteredTransactions.forEach((transaction, index) => {
-            const li = document.createElement("li");
-            li.classList.add("entry", transaction.type);
-            li.innerHTML = `
-                ${transaction.description}: ₹${transaction.amount}
-                <button onclick="editTransaction(${index})">✏️</button>
-                <button onclick="deleteTransaction(${index})">❌</button>
-            `;
-            entriesList.appendChild(li);
-        });
-
-        updateSummary();
-    }
-
-    addButton.addEventListener("click", function () {
-        const description = descriptionInput.value.trim();
-        const amount = parseFloat(amountInput.value.trim());
-        const type = typeInput.value;
-
-        if (description === "" || isNaN(amount) || amount <= 0) {
-            alert("Please enter valid details.");
-            return;
-        }
-
-        transactions.push({ description, amount, type });
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-
-        descriptionInput.value = "";
-        amountInput.value = "";
-        renderTransactions();
+function filterEntries() {
+    const filter = document.querySelector('input[name="filter"]:checked').value;
+    const list = document.getElementById('entries-list');
+    list.innerHTML = '';
+    entries.filter(e => filter === 'all' || e.type === filter).forEach(entry => {
+        list.innerHTML += `
+            <li>
+                <span>${entry.desc} - $${entry.amount} (${entry.type})</span>
+                <div>
+                    <button onclick="editEntry(${entry.id})">Edit</button>
+                    <button onclick="deleteEntry(${entry.id})">Delete</button>
+                </div>
+            </li>`;
     });
+}
 
-    resetButton.addEventListener("click", function () {
-        descriptionInput.value = "";
-        amountInput.value = "";
-    });
-
-    window.deleteTransaction = function (index) {
-        transactions.splice(index, 1);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-        renderTransactions();
-    };
-
-    window.editTransaction = function (index) {
-        const transaction = transactions[index];
-
-        descriptionInput.value = transaction.description;
-        amountInput.value = transaction.amount;
-        typeInput.value = transaction.type;
-
-        deleteTransaction(index);
-    };
-
-    filters.forEach((filter) => {
-        filter.addEventListener("change", function () {
-            renderTransactions(this.value);
-        });
-    });
-
-    renderTransactions();
-});
+updateUI();
