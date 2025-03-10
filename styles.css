@@ -1,8 +1,8 @@
+/* styles.css */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    text-align: center;
-    margin: 20px;
+    background: #f4f4f4;
+    padding: 20px;
 }
 
 .container {
@@ -11,21 +11,62 @@ body {
     background: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+h2 {
+    color: #2c3e50;
 }
 
 .summary {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    margin-bottom: 20px;
+    background: #ecf0f1;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
 }
 
-.form input, .form select, .form button {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 8px;
+.summary p {
+    font-weight: bold;
+    color: #34495e;
+}
+
+.input-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.input-form input, .input-form select, .input-form button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.input-form button {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.input-form button:hover {
+    background: #27ae60;
+}
+
+.filters {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.filters label {
+    font-weight: bold;
+    color: #2980b9;
+    cursor: pointer;
 }
 
 #entries-list {
@@ -33,27 +74,36 @@ body {
     padding: 0;
 }
 
-.entry {
+#entries-list li {
     display: flex;
     justify-content: space-between;
-    background: #fff;
+    background: #ecf0f1;
     padding: 10px;
-    border-radius: 5px;
     margin: 5px 0;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    border-left: 5px solid #3498db;
+    transition: all 0.3s ease-in-out;
 }
 
-.entry.income {
-    border-left: 5px solid green;
+#entries-list li:hover {
+    background: #d5dbdb;
 }
 
-.entry.expense {
-    border-left: 5px solid red;
+#entries-list li span {
+    font-weight: bold;
+    color: #2c3e50;
 }
 
-.entry button {
-    margin-left: 5px;
-    padding: 5px;
+#entries-list button {
+    background: #e74c3c;
+    color: white;
     border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
     cursor: pointer;
+    margin-left: 5px;
+}
+
+#entries-list button:hover {
+    background: #c0392b;
 }
